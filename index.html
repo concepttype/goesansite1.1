@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>100시간 웹사이트</title>
+
+  <style>
+    .news-section {
+  max-width: 1000px;
+  margin: 0 auto 40px;
+  padding: 0 16px;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.news-grid img {
+  width: 100%;
+  aspect-ratio: 3 / 4;   /* 신문 비율 안정 */
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.image-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+/* ===== 모바일 최적화: 한 줄 배치 ===== */
+@media (max-width: 768px) {
+  .news-grid {
+    display: flex;              /* 한 줄 */
+    overflow-x: auto;           /* 가로 스크롤 */
+    gap: 10px;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .news-grid img {
+    flex: 0 0 70%;               /* 화면 대비 크기 */
+    max-width: 70%;
+    scroll-snap-align: start;
+  }
+}
+
+/* ===== 아주 작은 화면 ===== */
+@media (max-width: 480px) {
+  .news-grid img {
+    flex: 0 0 85%;
+    max-width: 85%;
+  }
+}
+
+/* ===== 버튼 한 줄 정렬 ===== */
+.buttons,
+.buttons.buttons1 {
+  flex-direction: row;      /* 가로 한 줄 */
+  flex-wrap: wrap;          /* 화면 작으면 줄바꿈 */
+  justify-content: center;
+  gap: 10px;
+}
+
+/* 버튼 크기 통일 */
+.buttons button,
+.buttons1 button {
+  min-width: 150px;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .buttons button,
+  .buttons1 button {
+    flex: 1 1 45%;          /* 두 개씩 정렬 */
+  }
+}
+
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    h3 {
+      margin-top: 30px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    /* ===== 버튼 ===== */
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+
+    .buttons button:hover {
+      background-color: #2f8633;
+    }
+
+    .buttons1 button {
+      background-color: #d25719;
+    }
+
+    .buttons1 button:hover {
+      background-color: #913000;
+    }
+
+    /* ===== 학교 소개 ===== */
+    .school-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      margin: 40px auto;
+      flex-wrap: wrap;
+      max-width: 900px;
+    }
+
+    .school-text {
+      max-width: 300px;
+      text-align: left;
+    }
+
+    .school-image {
+      width: 400px;
+      max-width: 90%;
+      border-radius: 10px;
+    }
+
+    /* ===== 급식표 (컴팩트) ===== */
+    .meal-section {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 10px;
+    }
+
+    .meal-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+
+    .meal-table thead th {
+      background: #4CAF50;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .meal-table tbody tr {
+      background: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .meal-table td {
+      padding: 8px;
+      font-size: 12px;
+      line-height: 1.3;
+      text-align: left;
+    }
+
+    .meal-date {
+      width: 60px;
+      text-align: center;
+      font-weight: bold;
+      color: #2f8633;
+    }
+
+    @media (max-width: 768px) {
+      .meal-table thead { display: none; }
+      .meal-table tr { display: block; margin-bottom: 10px; }
+      .meal-table td { display: block; }
+      .meal-date {
+        background: #e8f5e9;
+        border-radius: 6px;
+        margin-bottom: 5px;
+      }
+    }
+
+    /* ===== 이미지 갤러리 ===== */
+    .image-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .image-gallery img {
+      width: 200px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .image-gallery img { width: 45%; }
+    }
+
+    /* ===== 일정표 ===== */
+    .schedule {
+      margin: 40px auto;
+      text-align: left;
+      max-width: 600px;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .schedule h2 {
+      text-align: center;
+    }
+
+    .schedule ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .schedule li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /* ===== 버튼 강제 가로 정렬 (기존 column 덮어쓰기) ===== */
+.buttons {
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.buttons.buttons1 {
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* 버튼 크기 통일 */
+.buttons button,
+.buttons1 button {
+  min-width: 150px;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .buttons button,
+  .buttons1 button {
+    flex: 1 1 45%;
+  }
+}
+/* ===== 이미지 확대 모달 ===== */
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
+
+.image-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+/* 커서 */
+.zoomable {
+  cursor: zoom-in;
+}
+  </style>
+</head>
+
+<body>
+
+<h1>괴산고등학교</h1>
+
+<div class="school-container">
+  <div class="school-text">
+    <h3>학교 소개</h3>
+    <p>괴산고등학교는 충청북도 괴산군에 위치한 <br> 고등학교로, 1964년에 설립되었습니다.</p>
+  </div>
+
+  <!-- 전경 이미지 1개만 유지 -->
+  <img src="괴산고등학교 이미지 1.png"
+  alt="괴산고 전경"
+  class="school-image zoomable"
+  onclick="openImage(this.src)">
+</div>
+
+<!-- ===== 급식표 ===== -->
+<div class="meal-section">
+  <title>2025년 12월 급식표</title>
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#fff;
+  padding:30px;
+}
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border:1px solid #ccc;
+}
+.day-header{
+  background:#f2f2f2;
+  text-align:center;
+  padding:8px 0;
+  font-weight:bold;
+  border-right:1px solid #ccc;
+  border-bottom:1px solid #ccc;
+}
+.day-header:last-child{border-right:none;}
+.cell{
+  min-height:150px;
+  padding:6px;
+  border-right:1px solid #ccc;
+  border-bottom:1px solid #ccc;
+  font-size:12px;
+  line-height:1.4;
+}
+.cell:nth-child(7n){border-right:none;}
+.date{font-weight:bold;margin-bottom:4px;}
+.sun{color:red;}
+.sat{color:blue;}
+.empty{background:#fafafa;}
+.meal b{display:block;margin-top:4px;}
+
+.tmi-box {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  max-width: 260px;
+  background: #f6fff6;
+  border: 2px dashed #6cc070;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  cursor: move;
+  z-index: 999;
+}
+
+.tmi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.tmi-title {
+  font-weight: bold;
+  font-size: 14.5px;
+  color: #2e7d32;
+}
+
+#tmiToggle {
+  border: none;
+  background: #6cc070;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tmi-content {
+  margin-top: 8px;
+}
+
+
+
+</style>
+</head>
+<div class="tmi-box" id="tmiBox">
+  <div class="tmi-header">
+    <span class="tmi-title">📌 괴산고 TMI</span>
+    <button id="tmiToggle">−</button>
+  </div>
+
+  <div class="tmi-content">
+    TmI.<br>
+    올해 괴산고등학교 졸업생들은 76회 졸업생입니다.(2007년생)<br>
+    괴산고등학교 교장선생님은 37대 교장선생님이십니다.<br>
+    괴산고등학교는 2024.9.1 자율형 공립고에 선정되었습니다.<br>
+    과거 괴산고등학교에는 괴정 제라는 축제가 있었습니다.<br>
+    괴산고등학교는 전경이 매우 이쁩니다.
+  </div>
+</div>
+
+
+
+
+<h1>2025년 12월 급식표</h1>
+
+<div class="calendar">
+  <div class="day-header sun">일</div>
+  <div class="day-header">월</div>
+  <div class="day-header">화</div>
+  <div class="day-header">수</div>
+  <div class="day-header">목</div>
+  <div class="day-header">금</div>
+  <div class="day-header sat">토</div>
+
+  <div class="cell empty"></div>
+
+  <div class="cell"><div class="date">1</div><div class="meal"><b>중식</b>쌀밥<br>전복미역국<br>연근돼지고기볶음<br>무생채<br>배추김치</div></div>
+  <div class="cell"><div class="date">2</div><div class="meal"><b>중식</b>작은밥<br>떡만두국<br>등심돈까스<br>통나물무침<br>스테비아방울토마토</div></div>
+  <div class="cell"><div class="date">3</div><div class="meal"><b>중식</b>나시고랭볶음밥<br>팽이버섯국<br>크림크로켓<br>피클<br>튀김바나나</div></div>
+  <div class="cell"><div class="date">4</div><div class="meal"><b>중식</b>찰기장밥<br>청국장찌개<br>소불고기<br>볶음김치</div></div>
+  <div class="cell"><div class="date">5</div><div class="meal"><b>중식</b>작은밥<br>버들삼계탕<br>매콤어묵볶음<br>깍두기</div></div>
+  <div class="cell sat"><div class="date">6</div></div>
+
+  <div class="cell sun"><div class="date">7</div></div>
+  <div class="cell"><div class="date">8</div><div class="meal"><b>중식</b>검정깨밥<br>김치콩나물국<br>간장불고기<br>교촌치킨<br>총각김치</div></div>
+  <div class="cell"><div class="date">9</div><div class="meal"><b>중식</b>차수수밥<br>육개장<br>시금치들깨무침<br>적새우볼까스</div></div>
+  <div class="cell"><div class="date">10</div><div class="meal"><b>중식</b>김밥볶음밥<br>어묵국<br>닭강정<br>한돈순무떡갈비추가</div></div>
+  <div class="cell"><div class="date">11</div><div class="meal"><b>중식</b>친환경쌀밥<br>순대국<br>오징어볶음<br>배추김치</div></div>
+  <div class="cell"><div class="date">12</div><div class="meal"><b>중식</b>현미찹쌀밥<br>오징어무국<br>돈육폭찹<br>수제찰보리꿀설100<br>맛김</div></div>
+  <div class="cell sat"><div class="date">13</div></div>
+
+  <div class="cell sun"><div class="date">14</div></div>
+  <div class="cell"><div class="date">15</div><div class="meal"><b>중식</b>찰기장밥<br>감자옹심이국<br>크리스피핫도그<br>수제미트볼<br>배추김치</div></div>
+  <div class="cell"><div class="date">16</div><div class="meal"><b>중식</b>차수수밥<br>설렁탕<br>우엉잡채<br>닭살바베큐떡볶이</div></div>
+  <div class="cell"><div class="date">17</div><div class="meal"><b>중식</b>고명비빔밥<br>미니우동<br>탕평채<br>배추김치</div></div>
+  <div class="cell"><div class="date">18</div><div class="meal"><b>중식</b>무농약흑미밥<br>순대국<br>생선커틀렛<br>깍두기</div></div>
+  <div class="cell"><div class="date">19</div><div class="meal"><b>중식</b>무농약차수수밥<br>바지락살부추국<br>미트볼샐러드파스타<br>배추김치</div></div>
+  <div class="cell sat"><div class="date">20</div></div>
+
+  <div class="cell sun"><div class="date">21</div></div>
+  <div class="cell"><div class="date">22</div><div class="meal"><b>중식</b>차수수밥<br>청국장찌개<br>한우불고기볶음<br>영양탕평채</div></div>
+  <div class="cell"><div class="date">23</div><div class="meal"><b>중식</b>무농약갈색밥<br>동태찌개<br>피망잡채<br>배추김치</div></div>
+  <div class="cell"><div class="date">24</div><div class="meal"><b>중식</b>검정콩밥<br>떡국/어묵국<br>마늘족발<br>훈제오리&와사비소스</div></div>
+  <div class="cell"><div class="date">25</div></div>
+  <div class="cell"><div class="date">26</div></div>
+  <div class="cell sat"><div class="date">27</div></div>
+
+  <div class="cell sun"><div class="date">28</div></div>
+  <div class="cell"><div class="date">29</div><div class="meal"><b>중식</b>무농약녹두밥<br>짜글이찌개<br>달걀프라이<br>바삭베이글볼빵<br>맛김</div></div>
+  <div class="cell"><div class="date">30</div><div class="meal"><b>중식</b>검정깨밥<br>양송이프레쉬스프<br>파스타샐러드<br>미니크로와상</div></div>
+  <div class="cell"><div class="date">31</div></div>
+</div>
+
+
+<!-- ===== 버튼 ===== -->
+<div class="buttons">
+  <button onclick="window.open('https://school.cbe.go.kr/goesan-h')">괴산고 홈페이지</button>
+  <button onclick="window.open('https://www.youtube.com/@%EA%B4%B4%EC%82%B0%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90%EB%98%90%EB%B0%94%EA%B8%B0')">괴산고 또바기 유튜브</button>
+  <button onclick="window.open('https://www.instagram.com/gshs_19604/')">괴산고 인스타</button>
+  <button onclick="window.open('https://m.blog.naver.com/PostList.naver?blogId=goesan_hs')">괴산고 블로그</button>
+</div>
+
+<div class="buttons buttons1">
+  <button onclick="window.open('https://www.youtube.com/@ADAM-y8e6z')">ADAM 유튜브</button>
+  <button onclick="window.open('https://www.instagram.com/band_adam/')">ADAM 인스타</button>
+  <button onclick="window.open('https://www.instagram.com/goesango_midanok/')">미단옥 인스타</button>
+</div>
+
+
+<section class="news-section">
+  <h2>이달의 신문</h2>
+  <div class="news-grid">
+    <img src="image0.jpeg" alt="이달의 신문 1">
+    <img src="image1.jpeg" alt="이달의 신문 2">
+    <img src="image2.jpeg" alt="이달의 신문 3">
+    <img src="image4.jpeg" alt="이달의 신문 4">
+  </div>
+</section>
+
+
+<!-- ===== 학사 일정 ===== -->
+<div class="schedule">
+  <h2>2025년 연간 일정표</h2>
+  <ul>
+    <li>6월 30일 ~ 7월 3일: 1학기 기말고사</li>
+    <li>7월 18일: 여름 방학식</li>
+    <li>9월 29일 ~ 10월 1일: 2학기 중간고사</li>
+    <li>11월 13일: 수능</li>
+    <li>12월 31일: 겨울방학식</li>
+  </ul>
+</div>
+<!-- 이미지 확대 모달 -->
+<div class="image-modal" id="imageModal">
+  <img id="modalImage">
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+
+    document.querySelectorAll(".news-grid img").forEach(img => {
+      img.addEventListener("click", () => {
+        modal.style.display = "flex";
+        modalImg.src = img.src;
+      });
+    });
+
+    modal.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  });
+</script>
+<div class="image-modal" id="imageModal" onclick="closeImage()">
+  <img id="modalImg">
+</div>
+<script>
+  // 접기 / 펼치기
+  const toggleBtn = document.getElementById("tmiToggle");
+  const content = document.querySelector(".tmi-content");
+
+  toggleBtn.onclick = () => {
+    if (content.style.display === "none") {
+      content.style.display = "block";
+      toggleBtn.textContent = "−";
+    } else {
+      content.style.display = "none";
+      toggleBtn.textContent = "+";
+    }
+  };
+
+  // 드래그 이동
+  const box = document.getElementById("tmiBox");
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  box.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - box.offsetLeft;
+    offsetY = e.clientY - box.offsetTop;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDragging) {
+      box.style.left = e.clientX - offsetX + "px";
+      box.style.top = e.clientY - offsetY + "px";
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+  });
+</script>
+
+</body>
+</html>
